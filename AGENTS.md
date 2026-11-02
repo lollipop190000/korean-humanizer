@@ -7,4 +7,4 @@
 - GPU/network operations require explicit execution options and the operator's own permissions and budget.
 - Check with `uv run --frozen --extra benchmark pytest`, `ruff check .` and `ruff format --check .` using the same uv environment.
 
-- The user requested publication of the trained adapter. Packaging and automatic application are prepared; provider permission for public model distribution is awaiting scope confirmation. Do not publish weights or claim release availability before that confirmation.
+- The user requested publication of the trained adapter. On 2026-11-02 the user confirmed that provider approval includes public download and redistribution of trained weights. Publish the verified adapter with MIT terms and preserve base-model/tokenizer Apache-2.0 notices. Do not request the same confirmation again.
