@@ -1,5 +1,12 @@
 # Changelog
 
+## Windows desktop v0.2.0 — 2026-11-02
+
+- Local text editor with rewrite/copy actions and a model kept in memory between requests.
+- Windows installer and desktop shortcut; automatic NVIDIA CUDA setup.
+- Automatic NF4 on NVIDIA GPUs with less than 12GiB VRAM; actual GPU generation remains unverified on the user's PC.
+
+
 ## Trained model release — 2026-11-02
 
 - Publish the verified 1,000-step LoRA adapter and make automatic download/application the default.

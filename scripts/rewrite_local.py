@@ -6,7 +6,6 @@ import sys
 from pathlib import Path
 
 from korean_humanizer.model_download import download_model
-from korean_humanizer.protection import check_protection
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -31,81 +30,9 @@ def prepare(text_file, adapter=None, max_new_tokens=256):
 
 
 def rewrite(text, spec, adapter, device, max_new_tokens):
-    import torch
-    from transformers import AutoModelForCausalLM, AutoTokenizer
+    from korean_humanizer.local_model import LocalModel
 
-    if device == "auto":
-        device = (
-            "cuda"
-            if torch.cuda.is_available()
-            else "mps"
-            if torch.backends.mps.is_available()
-            else "cpu"
-        )
-    if device == "cuda" and not torch.cuda.is_available():
-        raise ValueError("CUDA GPU unavailable; select a GPU runtime or use --device cpu")
-    if device == "mps" and not torch.backends.mps.is_available():
-        raise ValueError("Apple MPS unavailable")
-    dtype = torch.float32 if device == "cpu" else torch.float16
-    if device == "cuda" and torch.cuda.is_bf16_supported():
-        dtype = torch.bfloat16
-    if adapter and (adapter / "tokenizer_config.json").is_file():
-        tokenizer = AutoTokenizer.from_pretrained(
-            str(adapter), local_files_only=True, trust_remote_code=False
-        )
-    else:
-        tokenizer = AutoTokenizer.from_pretrained(
-            spec["model_id"], revision=spec["revision"], trust_remote_code=False
-        )
-    prompt = tokenizer.apply_chat_template(
-        [
-            {"role": "system", "content": spec["instruction"]},
-            {"role": "user", "content": text},
-        ],
-        tokenize=False,
-        add_generation_prompt=True,
-        enable_thinking=False,
-    )
-    inputs = tokenizer(prompt, add_special_tokens=False, return_tensors="pt")
-    count = inputs.input_ids.shape[-1]
-    if count > 2048:
-        raise ValueError("Input exceeds the demo's 2048-token limit; split the text")
-    model = AutoModelForCausalLM.from_pretrained(
-        spec["model_id"],
-        revision=spec["revision"],
-        torch_dtype=dtype,
-        device_map={"": device},
-        trust_remote_code=False,
-        use_safetensors=True,
-        attn_implementation="sdpa",
-    ).eval()
-    if adapter:
-        from peft import PeftModel
-
-        model = PeftModel.from_pretrained(
-            model, str(adapter), is_trainable=False, local_files_only=True
-        ).eval()
-    with torch.inference_mode():
-        generated = model.generate(
-            **inputs.to(device),
-            do_sample=False,
-            max_new_tokens=max_new_tokens,
-            pad_token_id=tokenizer.pad_token_id or tokenizer.eos_token_id,
-        )
-    tokens = generated[0, count:]
-    output = tokenizer.decode(tokens, skip_special_tokens=True)
-    eos = model.generation_config.eos_token_id
-    eos_ids = eos if isinstance(eos, list) else [eos]
-    return {
-        "candidate": "local-adapter" if adapter else "qwen3-4b-base",
-        "base_revision": spec["revision"],
-        "device": device,
-        "dtype": str(dtype),
-        "output": output,
-        "finish_reason": "stop" if int(tokens[-1]) in eos_ids else "length",
-        "checks": check_protection(text, output),
-        "human_review_completed": False,
-    }
+    return LocalModel(spec, adapter, device).rewrite(text, max_new_tokens)
 
 
 def main():

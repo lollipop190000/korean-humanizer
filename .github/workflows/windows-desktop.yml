@@ -1,0 +1,69 @@
+name: Windows desktop installer
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'windows/**'
+      - 'desktop/**'
+      - '*cmd'
+      - 'src/korean_humanizer/desktop.py'
+      - 'src/korean_humanizer/local_model.py'
+      - 'scripts/run_desktop.py'
+      - 'scripts/build_windows_package.py'
+      - '.github/workflows/windows-desktop.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  windows-check:
+    runs-on: windows-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate actual Windows installation without GPU dependencies
+        shell: powershell
+        run: ./windows/install.ps1 -InstallRoot "$env:RUNNER_TEMP/KoreanHumanizerTest" -ToolsOnly -NoLaunch
+      - name: Validate Windows CUDA and adapter dependencies without running a model
+        shell: powershell
+        run: |
+          $root = "$env:RUNNER_TEMP/KoreanHumanizerTest"
+          $uv = "$root/tools/uv.exe"
+          $python = "$root/app/.venv-inference/Scripts/python.exe"
+          & $uv pip install --python $python torch==2.6.0 --index-url https://download.pytorch.org/whl/cu124
+          if ($LASTEXITCODE -ne 0) { throw 'CUDA package installation failed.' }
+          & $uv pip install --python $python -r requirements/inference.txt bitsandbytes==0.45.5
+          if ($LASTEXITCODE -ne 0) { throw 'Inference dependency installation failed.' }
+          & $python -c "import torch, transformers, peft, bitsandbytes; assert torch.version.cuda == '12.4'; print('Windows inference dependencies imported successfully; no GPU inference performed.')"
+          if ($LASTEXITCODE -ne 0) { throw 'Inference dependency import failed.' }
+      - name: Verify browser server starts on Windows
+        shell: powershell
+        run: |
+          $app = "$env:RUNNER_TEMP/KoreanHumanizerTest/app"
+          $python = "$app/.venv-inference/Scripts/python.exe"
+          $process = Start-Process -FilePath $python -ArgumentList @('scripts/run_desktop.py', '--no-browser', '--port', '8766') -WorkingDirectory $app -PassThru
+          try {
+            $ready = $false
+            for ($i = 0; $i -lt 30; $i++) {
+              try {
+                $health = Invoke-RestMethod 'http://127.0.0.1:8766/api/health'
+                if ($health.application -eq 'korean-humanizer-local-v1') { $ready = $true; break }
+              } catch { Start-Sleep -Seconds 1 }
+            }
+            if (-not $ready) { throw 'Local UI did not start.' }
+            $page = Invoke-WebRequest -UseBasicParsing 'http://127.0.0.1:8766/'
+            if (-not $page.Content.Contains('id="input"') -or -not $page.Content.Contains('id="output"')) { throw 'Missing editor fields.' }
+          } finally { Stop-Process -Id $process.Id -ErrorAction SilentlyContinue }
+  package:
+    needs: windows-check
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - run: python scripts/build_windows_package.py
+      - name: Publish Windows download
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create desktop-v0.2.0 --title 'Windows desktop v0.2.0' --notes-file windows/RELEASE_NOTES.md --target "$GITHUB_SHA" --latest=false
+          gh release upload desktop-v0.2.0 dist/Korean-Humanizer-Windows.zip dist/SHA256SUMS.txt

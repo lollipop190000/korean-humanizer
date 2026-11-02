@@ -13,6 +13,9 @@ validation, completion-only LoRA training, and paired evaluation.
 
 ## PC와 Colab에서 사용하기
 
+**글을 직접 입력하는 화면이 필요하다면 [Windows 앱 설치](docs/DESKTOP.md)를 이용하세요.**
+ZIP 압축 해제 → `Install.cmd` 실행 → 바탕화면 바로가기로 시작합니다.
+
 - [Windows·macOS·Linux 설치 및 실제 모델 실행](docs/INSTALL.md)
 - [Google Colab 안내](docs/COLAB.md)
 

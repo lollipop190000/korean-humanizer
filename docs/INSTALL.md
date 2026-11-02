@@ -1,11 +1,13 @@
 # PC 설치와 문장 다듬기
 
+명령어 대신 글 입력 화면을 쓰려면 [Windows 설치 파일](DESKTOP.md)을 이용하세요.
+
 [Colab에서 설치 없이 시작하기](COLAB.md) · [학습 안내](TRAINING.md)
 
 이번 학습 결과는 **Qwen3-4B + nikl-practical-001 LoRA 어댑터**입니다.
 설치는 실행 도구와 기반 모델을 준비하고, 추가 어댑터를 적용하는 과정입니다.
 학습된 어댑터 약 126MiB와 고정 토크나이저를 합친 배포 파일은 약 141MiB입니다.
-웹 앱/설치형 GUI가 아닌 터미널 도구입니다.
+이 문서는 터미널 도구 설치 안내입니다. 별도의 [로컬 화면](DESKTOP.md)도 제공합니다.
 
 [모델 릴리스](https://github.com/lollipop190000/korean-humanizer/releases/tag/model-nikl-practical-001)에 실제 학습 파일을 공개했습니다.
 기본 실행은 어댑터를 자동으로 받고 검증합니다. 다운로드 실패 시 오류로 멈추며 기반 모델로
