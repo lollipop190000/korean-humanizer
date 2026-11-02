@@ -6,8 +6,9 @@
 Reproducible tools for Korean rewriting research: provenance checks, protected-span
 validation, completion-only LoRA training, and paired evaluation.
 
-**이 공개판은 연구용 소스코드입니다. 학습된 모델·어댑터와 실제 학습 코퍼스는 포함하지 않습니다.**
-설치만으로 완성된 Humanizer 모델이 실행되는 배포판은 아닙니다.
+**학습된 모델은 `nikl-practical-001` LoRA 어댑터와 Qwen3-4B를 함께 사용합니다.**
+어댑터 배포 준비를 마쳤으며, 자료 제공기관의 공개 승인 범위 확인 후 릴리스에 게시합니다.
+현재 공개 릴리스에는 학습 가중치가 아직 없습니다. 실제 학습 코퍼스는 배포하지 않습니다.
 `identity`는 입력을 그대로 반환하는 소프트웨어 비교 기준입니다.
 
 ## PC와 Colab에서 사용하기
@@ -17,8 +18,9 @@ validation, completion-only LoRA training, and paired evaluation.
 
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/lollipop190000/korean-humanizer/blob/main/notebooks/quickstart.ipynb)
 
-기본 도구 확인은 GPU 없이 가능합니다. 선택 추론 예제는 Qwen3-4B 기반 모델 또는
-직접 보유한 호환 어댑터를 사용합니다. 프로젝트 학습 가중치를 자동 제공하지 않습니다.
+기본 도구 확인은 GPU 없이 가능합니다. 준비 중인 모델 실행기는 학습된 어댑터를 자동으로
+내려받아 적용합니다. 모델 파일을 받을 수 없으면 오류로 멈추며 기반 모델로 대체하지 않습니다.
+기반 모델만 실행하려면 `--base`를 명시합니다.
 
 ## 시작하기
 
@@ -79,4 +81,5 @@ uv run --frozen --extra benchmark ruff format --check .
 자세한 범위는 [NOTICE](NOTICE), [외부 자료 고지](docs/THIRD_PARTY_NOTICES.md),
 [데이터 정책](docs/DATA_POLICY.md)을 확인하세요.
 
-학습 모델·LoRA 어댑터·실제 말뭉치·실험 원시 출력·비공개 운영 도구는 이 공개판에 포함되지 않습니다.
+Git 소스 이력에는 가중치를 넣지 않습니다. 승인 확인 뒤 별도 모델 릴리스로 배포할 예정이며,
+실제 말뭉치·실험 원시 출력·비공개 운영 도구는 배포하지 않습니다.

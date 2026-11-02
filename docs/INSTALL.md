@@ -2,9 +2,14 @@
 
 [Colab에서 설치 없이 시작하기](COLAB.md) · [학습 안내](TRAINING.md)
 
-공개판에는 데이터·학습·평가 도구와 **Qwen3-4B 기반 모델 실행 예제**가 있습니다.
-프로젝트에서 학습한 어댑터는 포함하지 않습니다. 어댑터를 지정하지 않으면 원래 Qwen3-4B를
-사용하며, 프로젝트의 학습 결과와 같지 않습니다. 웹 앱/설치형 GUI가 아닌 터미널 도구입니다.
+이번 학습 결과는 **Qwen3-4B + nikl-practical-001 LoRA 어댑터**입니다.
+설치는 실행 도구와 기반 모델을 준비하고, 추가 어댑터를 적용하는 과정입니다.
+학습된 어댑터 약 126MiB와 고정 토크나이저를 합친 배포 준비본은 약 141MiB입니다.
+웹 앱/설치형 GUI가 아닌 터미널 도구입니다.
+
+현재 어댑터 공개 승인 범위 확인을 기다리고 있어 공개 다운로드는 아직 열리지 않았습니다.
+아래 기본 실행 흐름은 공개 후 사용할 준비본이며, 파일이 없으면 오류로 멈춥니다.
+기반 모델로 몰래 바꿔 실행하지 않습니다. 직접 받은 어댑터는 `--adapter`로 사용 가능합니다.
 
 ## 1. 기본 도구 설치 (GPU 불필요)
 
@@ -26,7 +31,7 @@ uv run --frozen kh mock-pipeline tests/fixtures/sources.jsonl --output-dir artif
 출력 폴더가 이미 있으면 `artifacts/demo-2`처럼 새 이름을 쓰세요.
 Windows에서 `uv`가 인식되지 않으면 설치 후 PowerShell을 다시 여세요.
 
-## 2. 선택: 실제 기반 모델 실행
+## 2. 실제 학습 모델 실행
 
 아래는 학습이 아닌 **단일 문장/짧은 글 추론**입니다. 처음에는 모델 다운로드가 필요합니다.
 모델 파일용 여유 디스크 15GB 이상을 준비하세요. 메모리는 입력 길이·장치·라이브러리에 따라
@@ -58,7 +63,7 @@ uv pip install --python .venv-inference/bin/python -e . -r requirements/inferenc
 ```bash
 # 설정 확인: 모델을 내려받거나 실행하지 않습니다.
 .venv-inference/bin/python scripts/rewrite_local.py --text-file artifacts/input.txt
-# 실제 추론: 첫 실행에 Hugging Face에서 고정 버전 Qwen3-4B를 다운로드합니다.
+# 실제 추론: 검증된 프로젝트 어댑터와 고정 버전 Qwen3-4B를 다운로드합니다.
 .venv-inference/bin/python scripts/rewrite_local.py --text-file artifacts/input.txt --execute
 ```
 
@@ -68,7 +73,12 @@ Windows의 실제 실행 예제:
 .venv-inference/Scripts/python.exe scripts/rewrite_local.py --text-file artifacts/input.txt --execute
 ```
 
-결과는 JSON의 `output`에 표시됩니다. `candidate: qwen3-4b-base`는 기반 모델입니다.
+결과는 JSON의 `output`에 표시됩니다. 기본 모델은 `candidate: nikl-practical-001`입니다.
+`--execute`에서 어댑터·설정·토크나이저를 내려받고 모든 파일의 크기와 SHA-256을 검증합니다.
+이후에는 검증한 파일을 재사용합니다. 첫 실행에만 어댑터와 기반 모델 다운로드가 필요합니다.
+
+학습 전 기반 모델과 비교하려면 같은 명령에 **`--base`**를 명시하세요. 이때만
+`candidate: qwen3-4b-base`가 표시됩니다. `--base`와 `--adapter`는 함께 사용할 수 없습니다.
 `finish_reason: length`이면 출력 길이 한도로 잘렸으므로 `--max-new-tokens 512`를 추가하거나
 입력을 줄이세요. 기본 출력은 256토큰, 입력은 프롬프트 포함 2,048토큰으로 제한합니다.
 숫자·인용 검사는 함께 출력하지만 의미·어투·자연스러움은 직접 확인해야 합니다.
@@ -86,7 +96,8 @@ Windows의 실제 실행 예제:
 
 Qwen/Qwen3-4B의 동일 기반 버전으로 학습한 **로컬 폴더**만 지정합니다.
 `adapter_config.json`과 `adapter_model.safetensors`가 필요합니다.
-어댑터는 프로젝트가 자동 다운로드하지 않습니다. 자신이 사용할 권한이 있는 파일을 준비하세요.
+기본 실행은 프로젝트 어댑터를 자동 다운로드합니다. `--adapter`는 이미 받은 파일이나
+자신이 사용할 권한이 있는 다른 호환 어댑터로 바꾸고 싶을 때만 필요합니다.
 
 ```bash
 .venv-inference/bin/python scripts/rewrite_local.py --text-file artifacts/input.txt --adapter artifacts/my-adapter --execute
@@ -96,6 +107,12 @@ Qwen/Qwen3-4B의 동일 기반 버전으로 학습한 **로컬 폴더**만 지�
 revision이 기록되지 않은 외부 어댑터의 정확한 호환성은 사용자가 확인해야 합니다.
 어댑터 사용권과 기반 모델 조건은 소스코드의 MIT 라이선스와 별도입니다.
 입력·출력은 로컬에서 처리하고 추론 API에 보내지 않습니다. 첫 모델 다운로드에는 인터넷이 필요합니다.
+
+## 다운로드 오류
+
+모델 릴리스가 미공개이거나 인터넷 접근이 막혀 있으면 실행을 중단합니다. 같은 명령에
+`--base`를 추가하는 것은 다른 모델을 쓰는 것이며 다운로드 오류의 해결책이 아닙니다.
+해시 불일치 파일은 자동 덮어쓰지 않습니다. 해당 파일을 다른 위치로 옮긴 뒤 다시 실행하세요.
 
 ## 검증 범위
 

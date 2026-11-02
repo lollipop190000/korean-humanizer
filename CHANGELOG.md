@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Prepare a verified trained-adapter download and default application flow, pending public-distribution confirmation.
+- Fail closed if trained weights are unavailable; base-only inference requires `--base`.
+
 - PC installation guide and Colab quickstart notebook with an optional inference section.
 - Local Qwen3-4B base/compatible adapter inference, explicit execution, and protected-content checks.
 - CPU notebook smoke run verified; actual CUDA/MPS model generation remains unverified for this example.

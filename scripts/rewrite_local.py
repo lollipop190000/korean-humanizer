@@ -1,10 +1,11 @@
-"""Optional Qwen3 inference on the user's computer; dry-run unless --execute is set."""
+"""Run the trained Korean Humanizer adapter; dry-run unless --execute is set."""
 
 import argparse
 import json
 import sys
 from pathlib import Path
 
+from korean_humanizer.model_download import download_model
 from korean_humanizer.protection import check_protection
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -48,9 +49,14 @@ def rewrite(text, spec, adapter, device, max_new_tokens):
     dtype = torch.float32 if device == "cpu" else torch.float16
     if device == "cuda" and torch.cuda.is_bf16_supported():
         dtype = torch.bfloat16
-    tokenizer = AutoTokenizer.from_pretrained(
-        spec["model_id"], revision=spec["revision"], trust_remote_code=False
-    )
+    if adapter and (adapter / "tokenizer_config.json").is_file():
+        tokenizer = AutoTokenizer.from_pretrained(
+            str(adapter), local_files_only=True, trust_remote_code=False
+        )
+    else:
+        tokenizer = AutoTokenizer.from_pretrained(
+            spec["model_id"], revision=spec["revision"], trust_remote_code=False
+        )
     prompt = tokenizer.apply_chat_template(
         [
             {"role": "system", "content": spec["instruction"]},
@@ -105,12 +111,18 @@ def rewrite(text, spec, adapter, device, max_new_tokens):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--text-file", type=Path, required=True, help="UTF-8 input file")
-    parser.add_argument("--adapter", type=Path, help="Your local compatible LoRA adapter folder")
+    candidate = parser.add_mutually_exclusive_group()
+    candidate.add_argument("--adapter", type=Path, help="Your local compatible LoRA adapter folder")
+    candidate.add_argument("--base", action="store_true", help="Explicitly use untrained base only")
     parser.add_argument("--device", choices=["auto", "cpu", "cuda", "mps"], default="auto")
     parser.add_argument("--max-new-tokens", type=int, default=256)
     parser.add_argument("--execute", action="store_true", help="Download weights and run inference")
     args = parser.parse_args()
     text, spec, adapter = prepare(args.text_file, args.adapter, args.max_new_tokens)
+    project_model = not args.base and args.adapter is None
+    selected = (
+        "nikl-practical-001" if project_model else "local-adapter" if adapter else "qwen3-4b-base"
+    )
     if not args.execute:
         print(
             json.dumps(
@@ -118,7 +130,7 @@ def main():
                     "mode": "dry-run",
                     "model": spec["model_id"],
                     "revision": spec["revision"],
-                    "candidate": "local-adapter" if adapter else "qwen3-4b-base",
+                    "candidate": selected,
                     "device": args.device,
                     "model_downloaded": False,
                     "next": "Add --execute to download model weights and run inference",
@@ -127,10 +139,15 @@ def main():
             )
         )
         return
+    if project_model:
+        print("Downloading/verifying the trained project adapter.", file=sys.stderr)
+        adapter = download_model(ROOT / "artifacts/models/nikl-practical-001")
+        text, spec, adapter = prepare(args.text_file, adapter, args.max_new_tokens)
     print("Loading model locally; first run downloads several GB of weights.", file=sys.stderr)
     print(
         json.dumps(
-            rewrite(text, spec, adapter, args.device, args.max_new_tokens),
+            rewrite(text, spec, adapter, args.device, args.max_new_tokens)
+            | {"candidate": selected},
             ensure_ascii=False,
             indent=2,
         )

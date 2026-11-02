@@ -23,7 +23,7 @@ def test_dry_run_needs_no_weights_or_inference_dependencies(tmp_path):
     )
     report = json.loads(result.stdout)
     assert report["mode"] == "dry-run"
-    assert report["candidate"] == "qwen3-4b-base"
+    assert report["candidate"] == "nikl-practical-001"
     assert report["model_downloaded"] is False
 
 
