@@ -1,0 +1,12 @@
+{"case_id": "eval-001", "input": "이 결과는 단순한 수치가 아니라 변화의 출발점이다. 표본 30개에서 차이가 관찰됐다.", "checks": ["30개 보존", "근거 없는 의미 부여 최소화"], "category": "inflated_conclusion"}
+{"case_id": "eval-002", "input": "효과가 있을 수 있지만, 이 실험만으로 원인을 단정할 수는 없다.", "checks": ["가능성 유지", "부정 유지", "최소 수정"], "category": "uncertainty"}
+{"case_id": "eval-003", "input": "A가 아니라 B를 사용해야 한다. A는 이 장비와 호환되지 않는다.", "checks": ["필수 대조 유지", "A/B 보존"], "category": "necessary_contrast"}
+{"case_id": "eval-004", "input": "“오늘은 여기까지 하자”라고 말했다.", "checks": ["인용문 그대로 유지"], "category": "quote"}
+{"case_id": "eval-005", "input": "CNN이 입력을 처리한다. 정확도는 91.2%이며 표본은 120개다.", "checks": ["CNN 보존", "숫자와 단위 연결 유지"], "category": "mixed_language"}
+{"case_id": "eval-006", "input": "비가 그쳤다. 마당에서는 젖은 흙 냄새가 났다.", "checks": ["불필요한 재작성 방지", "감정 추가 방지"], "category": "minimal_edit"}
+{"case_id": "eval-007", "input": "시료를 25 ℃에서 3일간 보관했다.", "checks": ["온도와 기간 보존"], "category": "units"}
+{"case_id": "eval-008", "input": "식은 $e = y - x$이다. 프로그램은 `return value`를 실행한다.", "checks": ["수식과 코드 그대로 유지"], "category": "math_code"}
+{"case_id": "eval-009", "input": "회의에 참석하기 어렵습니다. 일정을 변경해 주실 수 있을까요?", "checks": ["격식 유지", "참석 여부 변경 방지"], "category": "register"}
+{"case_id": "eval-010", "input": "기한 내 서류를 제출한 경우에만 심사 대상이 됩니다.", "checks": ["조건과 제한 유지"], "category": "condition"}
+{"case_id": "eval-011", "input": "신청은 11월 2일까지 받습니다. 접수 순서가 선발 순서를 의미하지는 않습니다.", "checks": ["날짜 보존", "부정 관계 보존"], "category": "official"}
+{"case_id": "eval-012", "input": "水는 물을 뜻한다. 한자 표기는 문맥에 따라 쓰임이 달라진다.", "checks": ["한자 보존", "언어 전환 방지"], "category": "hanja"}

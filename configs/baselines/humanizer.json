@@ -1,0 +1,19 @@
+{
+  "candidate": "humanizer-reference",
+  "model_id": "jialinyyzz/humanizer",
+  "revision": "2e57b6528a4070c33f3e09ca24e3325a84272f68",
+  "protocol": "completion",
+  "instruction": "Rewrite the text below so it reads like a person wrote it, not a language model.\n\nReorganize it as you see fit. Vary sentence length on purpose. Cut hedging,\nthroat-clearing, and any sentence that only announces what comes next.\nPrefer the concrete word over the abstract one. It is fine to sound uneven.\n\nEvery fact, number, unit, date, name and quotation must survive unchanged.",
+  "separator": "\n\n### Rewritten:\n\n",
+  "official_prompt_fingerprint": "cc51d66b4c593fbe",
+  "temperature": 1.0,
+  "top_p": 0.95,
+  "top_k": 0,
+  "min_p": 0.0,
+  "repetition_penalty": 1.0,
+  "enable_thinking": false,
+  "context_tokens": 8192,
+  "max_output_tokens": 2048,
+  "seed": 42,
+  "source_url": "https://huggingface.co/jialinyyzz/humanizer/resolve/2e57b6528a4070c33f3e09ca24e3325a84272f68/prompt_format.json"
+}

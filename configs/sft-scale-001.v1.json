@@ -1,0 +1,19 @@
+{
+  "data_policy": "pending_research",
+  "model_id": "Qwen/Qwen3-4B",
+  "revision": "1cfa9a7208912126459214e8b04321603b3df60c",
+  "method": "bf16_lora",
+  "max_sequence_tokens": 2048,
+  "max_steps": 1000,
+  "gradient_accumulation_steps": 4,
+  "learning_rate": 0.00005,
+  "lora_rank": 16,
+  "lora_alpha": 32,
+  "lora_dropout": 0.05,
+  "seed": 42,
+  "min_train_examples": 2000,
+  "min_dev_examples": 200,
+  "eval_steps": 100,
+  "save_steps": 100,
+  "warmup_steps": 30
+}

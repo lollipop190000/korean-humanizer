@@ -1,0 +1,17 @@
+{
+  "candidate": "qwen3-4b",
+  "model_id": "Qwen/Qwen3-4B",
+  "revision": "1cfa9a7208912126459214e8b04321603b3df60c",
+  "protocol": "chat",
+  "instruction": "다음 글을 자연스러운 한국어로 다듬으세요. 사실, 부정, 조건, 불확실성과 원래 어투를 유지하세요. 숫자, 단위, 이름, 인용, 수식과 코드를 보존하세요. 이미 자연스러운 부분은 그대로 두세요. 설명 없이 수정한 글만 출력하세요.",
+  "temperature": 0.7,
+  "top_p": 0.8,
+  "top_k": 20,
+  "min_p": 0.0,
+  "repetition_penalty": 1.0,
+  "enable_thinking": false,
+  "context_tokens": 8192,
+  "max_output_tokens": 2048,
+  "seed": 42,
+  "source_url": "https://huggingface.co/Qwen/Qwen3-4B/blob/1cfa9a7208912126459214e8b04321603b3df60c/README.md"
+}

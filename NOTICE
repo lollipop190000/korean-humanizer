@@ -1,0 +1,16 @@
+Korean Humanizer
+Copyright (c) 2026 lollipop190000
+
+Original project code, documentation and synthetic software fixtures are
+licensed under the MIT License; see LICENSE.
+
+The instruction and separator in configs/baselines/humanizer.json are copied,
+unmodified, from jialinyyzz/humanizer/prompt_format.json at revision
+2e57b6528a4070c33f3e09ca24e3325a84272f68 (Humanizer project, Stephen Yu /
+jialinyyzz / sgaofen). Those upstream portions remain under Apache License 2.0,
+not MIT. See docs/THIRD_PARTY_NOTICES.md, licenses/humanizer-NOTICE.txt
+and licenses/humanizer-LICENSE.txt.
+
+No third-party corpus, trained model weights, adapters or private evaluation
+outputs are distributed. Installing dependencies or downloading a model does
+not relicense those materials under this project's MIT License.

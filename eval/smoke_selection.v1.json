@@ -1,0 +1,18 @@
+{
+  "dataset_sha256": "3c4b36b14e9ae58da60f30fb0d2b2c7ee726b1c4046d176fe3473bcf417b113f",
+  "purpose": "first_local_model_smoke_not_quality_benchmark",
+  "case_ids": [
+    "dev-report-01",
+    "dev-report-04",
+    "dev-explanation-01",
+    "dev-explanation-04",
+    "dev-email-01",
+    "dev-email-04",
+    "dev-essay-01",
+    "dev-essay-04",
+    "dev-post-01",
+    "dev-post-04",
+    "dev-official-01",
+    "dev-official-04"
+  ]
+}

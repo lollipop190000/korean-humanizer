@@ -1,0 +1,14 @@
+# Task 3 planning template, not an executable training configuration.
+status = "unverified_candidate"
+model_id = "Qwen/Qwen3-4B"
+alternative_model_id = "Qwen/Qwen3-8B"
+reference_model_id = "jialinyyzz/humanizer"
+python = "3.11"
+candidate_vram_gb = [24, 48]
+method_candidates = ["qlora", "bf16_lora"]
+container_image_digest = "TO_BE_VERIFIED"
+gpu_dependency_lock = "TO_BE_CREATED_ON_SELECTED_GPU_IMAGE"
+persistent_root = "./artifacts/persistent"
+max_runtime_hours = 0
+approved_budget_usd = "0"
+execute = false

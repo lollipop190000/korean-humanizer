@@ -1,0 +1,155 @@
+{
+  "workflow_id": "scale-001",
+  "data": {
+    "source_host": "www.korea.kr",
+    "article_route": "/news/reporterView.do",
+    "years": [
+      2016,
+      2017,
+      2018
+    ],
+    "required_license": "explicit KOGL-1 for article text",
+    "max_article_requests": 2500,
+    "max_list_requests": 260,
+    "request_interval_seconds": 1,
+    "max_excerpts": 8000,
+    "max_chars_per_excerpt": 600,
+    "max_examples_per_document": 4,
+    "max_train_examples_per_author": 20,
+    "target_train": 2000,
+    "target_dev": 200,
+    "genre_targets": {
+      "experience_review": {
+        "fraction": 0.3,
+        "train": 600,
+        "dev": 60
+      },
+      "explanation_information": {
+        "fraction": 0.4,
+        "train": 800,
+        "dev": 80
+      },
+      "opinion_column": {
+        "fraction": 0.2,
+        "train": 400,
+        "dev": 40
+      },
+      "practical_notice": {
+        "fraction": 0.1,
+        "train": 200,
+        "dev": 20
+      }
+    },
+    "proposed_reverse_sft_train_pairs": 1800,
+    "proposed_natural_input_controls": 200,
+    "natural_controls_use_disjoint_source_excerpts": true,
+    "preserve_existing_splits": true,
+    "generate_training_pairs_from_test": false,
+    "corpus_and_rights_evidence_required": true,
+    "supplemental_providers": {
+      "gyeonggi": {
+        "source_host": "gnews.gg.go.kr",
+        "article_route": "/news/news_detail.do",
+        "list_route": "/news/news_list.do",
+        "section_codes": [
+          "C056",
+          "C083",
+          "C094",
+          "C109",
+          "C049",
+          "C401"
+        ],
+        "max_article_requests": 1500,
+        "max_list_requests": 200,
+        "reason": "Optional source example; verify current rights and scope before collection."
+      },
+      "gyeonggi_early": {
+        "source_host": "gnews.gg.go.kr",
+        "article_route": "/news/news_detail.do",
+        "list_route": "/news/news_list.do",
+        "years": [
+          2014,
+          2015
+        ],
+        "section_codes": [
+          "C056",
+          "C083"
+        ],
+        "max_article_requests": 900,
+        "max_list_requests": 80,
+        "reason": "Optional source example; verify current rights and scope before collection."
+      }
+    }
+  },
+  "generation": {
+    "model_id": "Qwen/Qwen3-8B",
+    "revision": "b968826d9c46dd6066d109eabc6255188de91218",
+    "max_draft_requests": 6000,
+    "max_output_tokens_each": 1024,
+    "max_semantic_judge_requests": 6000,
+    "max_judge_output_tokens_each": 384,
+    "desired_batch_size": 4,
+    "automatic_request_retries": 0,
+    "initial_bounded_calibration_requests": 32,
+    "calibration_part_of_request_limits": true,
+    "calibration_requires_new_survey": false,
+    "forecast_cost_before_bulk_generation": true,
+    "additional_distinct_protocol_validation_requests": 96,
+    "transport_retry_only_if_worker_proves_upload_never_started": 1
+  },
+  "quality": {
+    "mechanical_protection_required": true,
+    "check_bidirectional_content_support": true,
+    "check_negation_uncertainty_viewpoint_register": true,
+    "judge_evidence_spans_required": true,
+    "invalid_or_unclear_judgments": "exclude",
+    "human_semantic_review_completed": false,
+    "retain_pending_review_status": true,
+    "survey_results_required_before_training": false,
+    "detector_score_used": false
+  },
+  "training": {
+    "config": "configs/sft-scale-001.v1.json",
+    "start_from": "pinned_clean_base_without_first_research_adapter",
+    "effective_batch_size": 4,
+    "optimizer_steps": 1000,
+    "sample_exposures": 4000,
+    "epochs_at_target_train_count": 2,
+    "select_exact_target_counts_before_freezing": true,
+    "insufficient_eligible_examples": "stop_and_report_without_padding_or_copying",
+    "preserve_instruction_and_completion_only_loss": true,
+    "training_and_before_after_comparison_share_one_bounded_pod": true
+  },
+  "evaluation": {
+    "regression_inputs": 72,
+    "natural_input_holdout_target": 100,
+    "baseline_and_final_adapter": true,
+    "never_train_on_evaluation_inputs": true,
+    "survey_after_model_outputs_exist": true,
+    "human_attestation_from_automated_judge": false
+  },
+  "budget_proposal": {
+    "total_usd": 30,
+    "max_gpu_hourly_usd": 0.7,
+    "max_aggregate_gpu_hours": 40,
+    "max_concurrent_gpus": 1,
+    "max_ephemeral_disk_gb": 120,
+    "persistent_volumes": 0,
+    "cost_reserve_usd": 1.3,
+    "aggregate_cost_ledger_required": true,
+    "per_phase_deadline_and_deletion_watchdog_required": true,
+    "delete_pods_and_retrieve_outputs_between_phases": true,
+    "approval_scope": "source collection, draft generation, automated filtering, one SFT and before/after evaluation within these combined limits",
+    "remaining_phase_hour_limits": {
+      "drafts": 11,
+      "judge": 6,
+      "training_and_comparison": 4
+    },
+    "existing_credit_verified_before_each_phase": true
+  },
+  "status": "example_not_authorized",
+  "spending_authorized": false,
+  "cpu_collection_authorized": false,
+  "user_approval_ref": null,
+  "pricing_status": "illustrative_not_a_live_quote"
+}

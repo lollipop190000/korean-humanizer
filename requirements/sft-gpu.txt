@@ -1,0 +1,11 @@
+# Candidate direct pins for the existing torch 2.6.0+cu124 / Python 3.11 image.
+# Install in the GPU environment only. GPU compatibility is not yet verified.
+# Transitive packages must be recorded with pip freeze in the actual run.
+transformers==4.51.3
+accelerate==1.6.0
+peft==0.15.2
+safetensors==0.5.3
+huggingface-hub==0.30.2
+
+# MIT; structural JSON constraints for indexed-v4, not semantic acceptance.
+lm-format-enforcer==0.11.3

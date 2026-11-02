@@ -1,0 +1,10 @@
+# Example calculation only; obtain a current provider quote before execution.
+pricing_status = "illustrative_not_a_live_quote"
+approved_for_execution = false
+budget_usd = "3"
+gpu_hourly_usd = "0.59"
+gpu_max_hours = "1"
+storage_gb = "80"
+storage_days = "0.0416666667"
+storage_usd_per_gb_month = "0.10"
+contingency_fraction = "0.50"

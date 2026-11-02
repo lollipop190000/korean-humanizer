@@ -1,0 +1,20 @@
+{
+  "study_id": "prompt-study-002",
+  "description": "36 development inputs, two fixed Qwen models, original vs targeted-edit instruction",
+  "anchor_dataset": "eval/dev_seed.v1.jsonl",
+  "anchor_selection": "eval/smoke_selection.v1.json",
+  "challenge_dataset": "eval/dev_challenge.v1.jsonl",
+  "rubric": "eval/prompt_study.v1.rubric.jsonl",
+  "models": ["configs/baselines/qwen3-4b.json", "configs/baselines/qwen3-8b.json"],
+  "prompts": [
+    {"id": "p0", "instruction": null},
+    {
+      "id": "p1",
+      "instruction": "아래 글을 한국어 편집자의 관점에서 다듬고, 수정한 글만 출력하세요.\n\n원문의 모든 사실과 작성자가 표현한 판단·기대·감정·사과를 유지하세요. 주체, 대상, 원인과 결과, 부정, 조건, 시간 순서, 확실성의 정도를 바꾸지 마세요. 원문에 없는 설명이나 감정을 덧붙이지 마세요.\n\n어색한 명사화나 피동 표현은 문맥에 맞는 동사로 풀고, 같은 뜻의 불필요한 반복과 돌아가는 문장은 간결하게 정리하세요. 번역한 듯한 어순과 끊기는 문장 연결은 자연스럽게 고치세요. 의미 있는 대조나 작성자의 의견을 군더더기로 판단해 삭제하지 마세요. 특정 표현이 있다는 이유만으로 고치거나 없애지 마세요.\n\n이미 자연스러운 문장은 그대로 두세요. 글의 장르, 시점, 높임말과 말투를 유지하고 모든 글을 구어체로 바꾸지 마세요. 숫자·단위·이름·직접 인용·코드·수식과 목록 형식을 보존하세요. 편집 과정이나 해설은 출력하지 마세요."
+    }
+  ],
+  "expected_cases": 36,
+  "expected_groups": 24,
+  "expected_requests": 144,
+  "approved_for_execution": false
+}

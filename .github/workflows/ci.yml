@@ -1,0 +1,21 @@
+name: CPU checks
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: "0.12.23"
+          enable-cache: true
+      - run: uv python install 3.11
+      - run: uv sync --frozen --group dev --extra benchmark
+      - run: uv run --frozen --extra benchmark ruff check .
+      - run: uv run --frozen --extra benchmark ruff format --check .
+      - run: uv run --frozen --extra benchmark pytest
+      - run: uv run --frozen --extra benchmark kh mock-pipeline tests/fixtures/sources.jsonl --output-dir artifacts/ci-smoke
+      - run: uv run --frozen --extra benchmark kh benchmark-validate eval/dev_seed.v1.jsonl
+      - run: uv run --frozen --extra benchmark kh benchmark-prepare eval/dev_seed.v1.jsonl --spec configs/baselines/humanizer.json --output-dir artifacts/ci-benchmark --allow-unreviewed

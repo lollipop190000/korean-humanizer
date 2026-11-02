@@ -1,0 +1,45 @@
+[build-system]
+requires = ["hatchling>=1.27,<2"]
+build-backend = "hatchling.build"
+
+[project]
+name = "korean-humanizer"
+version = "0.1.0"
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE", "NOTICE", "licenses/*.txt"]
+authors = [{name = "lollipop190000"}]
+description = "Reproducible data and evaluation tools for a Korean Humanizer"
+requires-python = ">=3.11,<3.13"
+dependencies = ["pydantic>=2.10,<3"]
+
+[project.optional-dependencies]
+benchmark = [
+    "tokenizers>=0.21,<1",
+    "jinja2>=3.1,<4",
+    "lm-format-enforcer==0.11.3",
+]
+
+[project.urls]
+Repository = "https://github.com/lollipop190000/korean-humanizer"
+Issues = "https://github.com/lollipop190000/korean-humanizer/issues"
+
+[project.scripts]
+kh = "korean_humanizer.cli:main"
+
+[dependency-groups]
+dev = ["pytest>=8.3,<9", "ruff>=0.11,<1"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/korean_humanizer"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]

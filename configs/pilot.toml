@@ -1,0 +1,26 @@
+# Illustrative arithmetic only. These are NOT verified provider prices or approval.
+pricing_status = "illustrative_not_a_quote"
+approved_for_execution = false
+budget_usd = "20"
+gpu_hourly_usd = "0.60"
+gpu_max_hours = "2"
+storage_gb = "20"
+storage_days = "3"
+storage_usd_per_gb_month = "0.10"
+contingency_fraction = "0.20"
+
+[[api]]
+name = "generation_including_max_configured_attempts"
+requests = 300
+input_tokens_per_request = 1200
+max_output_tokens_per_request = 1000
+input_usd_per_million = "1.00"
+output_usd_per_million = "4.00"
+
+[[api]]
+name = "pair_judging_including_max_configured_attempts"
+requests = 300
+input_tokens_per_request = 2400
+max_output_tokens_per_request = 400
+input_usd_per_million = "1.00"
+output_usd_per_million = "4.00"
