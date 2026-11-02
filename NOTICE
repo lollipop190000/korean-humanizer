@@ -11,6 +11,8 @@ jialinyyzz / sgaofen). Those upstream portions remain under Apache License 2.0,
 not MIT. See docs/THIRD_PARTY_NOTICES.md, licenses/humanizer-NOTICE.txt
 and licenses/humanizer-LICENSE.txt.
 
-No third-party corpus, trained model weights, adapters or private evaluation
-outputs are distributed. Installing dependencies or downloading a model does
-not relicense those materials under this project's MIT License.
+The trained nikl-practical-001 LoRA additions are distributed as separate release
+assets under MIT. Included Qwen tokenizer files retain Apache-2.0 terms. Base
+weights are downloaded separately. See the model package LICENSE, NOTICE and
+BASE_MODEL_LICENSE.txt. No training corpus or private evaluation outputs are
+distributed; those materials are not relicensed under MIT.

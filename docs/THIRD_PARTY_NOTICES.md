@@ -11,7 +11,7 @@ Source: https://huggingface.co/jialinyyzz/humanizer/blob/2e57b6528a4070c33f3e09c
 The upstream LICENSE and NOTICE are preserved verbatim in
 `licenses/humanizer-LICENSE.txt` and `licenses/humanizer-NOTICE.txt`.
 The upstream notice describes its own Gemma-based models, not this project's Qwen training recipe. A standard Apache-2.0 copy is also in `licenses/Apache-2.0.txt`.
-Original project code is MIT-licensed. The upstream prompt portions remain Apache-2.0 licensed. Neither license grants rights to third-party training corpora or makes excluded model weights available.
+Original project code is MIT-licensed. The upstream prompt portions remain Apache-2.0 licensed. Neither license grants rights to third-party training corpora.
 
 
 ## Dependencies and model references
@@ -27,5 +27,7 @@ Their official model repositories provide their applicable licenses and model ca
 A reference to another model or a downloadable corpus does not put it under MIT.
 
 The files in eval/ and tests/fixtures/ are original synthetic development material under MIT.
-No NIKL corpus, private derived training pair, trained adapter, operational backup or raw
-research response is included in this source release.
+No NIKL corpus, private derived training pair, operational backup or raw research response
+is included. The project's trained LoRA additions are separate MIT-licensed release assets;
+Qwen tokenizer files included in that package retain Apache-2.0. See the model
+package LICENSE, NOTICE, BASE_MODEL_LICENSE.txt and [model card](MODEL.md).

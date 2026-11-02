@@ -1,8 +1,8 @@
 # Changelog
 
-## Unreleased
+## Trained model release — 2026-11-02
 
-- Prepare a verified trained-adapter download and default application flow, pending public-distribution confirmation.
+- Publish the verified 1,000-step LoRA adapter and make automatic download/application the default.
 - Fail closed if trained weights are unavailable; base-only inference requires `--base`.
 
 - PC installation guide and Colab quickstart notebook with an optional inference section.
