@@ -11,6 +11,9 @@ from korean_humanizer.desktop import Application, make_server
 
 
 class FakeModel:
+    def prompt_token_count(self, text):
+        return 100 + len(text)
+
     def rewrite(self, text, max_new_tokens):
         return {
             "output": "합성 시험 결과: " + text,
@@ -113,4 +116,36 @@ def test_failed_model_never_returns_base_model_result():
     result = finished(app)
     assert result["status"] == "error"
     assert "result" not in result
+    app.pool.shutdown()
+
+
+def test_long_korean_json_request_and_validation(local_app):
+    url, token, app, loads = local_app
+    text = "한글 문장. " * 3000
+    assert len(json.dumps({"text": text}).encode()) > 65536
+    assert request(url, token, text) == 202
+    state = finished(app)
+    assert state["status"] == "done"
+    assert state["result"]["chunks_total"] > 1
+    assert len(loads) == 1
+    with pytest.raises(urllib.error.HTTPError) as error:
+        request(url, token, "가" * 50001)
+    assert error.value.code == 400
+
+
+def test_identity_is_visible_and_failed_document_has_no_result():
+    from test_long_text import EchoModel
+
+    app = Application(EchoModel)
+    app.submit("  원래 글\n\n다음 문단  ")
+    state = finished(app)
+    assert state["status"] == "done"
+    assert "변경 없음" in state["message"]
+    assert state["result"]["output"] == "  원래 글\n\n다음 문단  "
+    app.model.rewrite = lambda *args, **kwargs: {"finish_reason": "stop", "output": ""}
+    app.submit("실패 입력")
+    state = finished(app)
+    assert state["status"] == "error"
+    assert "전체 미완료" in state["message"]
+    assert "result" not in state
     app.pool.shutdown()

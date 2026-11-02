@@ -71,13 +71,8 @@ class LocalModel:
         self.spec, self.adapter, self.device = spec, adapter, device
         self.dtype, self.quantized = dtype, quantized
 
-    def rewrite(self, text, max_new_tokens=512):
-        if not text.strip():
-            raise ValueError("다듬을 글을 입력해 주세요.")
-        if not 1 <= max_new_tokens <= 1024:
-            raise ValueError("출력 길이 범위가 올바르지 않습니다.")
-        tokenizer, model, torch = self.tokenizer, self.model, self.torch
-        prompt = tokenizer.apply_chat_template(
+    def render_prompt(self, text):
+        return self.tokenizer.apply_chat_template(
             [
                 {"role": "system", "content": self.spec["instruction"]},
                 {"role": "user", "content": text},
@@ -86,6 +81,17 @@ class LocalModel:
             add_generation_prompt=True,
             enable_thinking=False,
         )
+
+    def prompt_token_count(self, text):
+        return len(self.tokenizer.encode(self.render_prompt(text), add_special_tokens=False))
+
+    def rewrite(self, text, max_new_tokens=512):
+        if not text.strip():
+            raise ValueError("다듬을 글을 입력해 주세요.")
+        if not 1 <= max_new_tokens <= 1024:
+            raise ValueError("출력 길이 범위가 올바르지 않습니다.")
+        tokenizer, model, torch = self.tokenizer, self.model, self.torch
+        prompt = self.render_prompt(text)
         inputs = tokenizer(prompt, add_special_tokens=False, return_tensors="pt")
         count = inputs.input_ids.shape[-1]
         if count > 2048:

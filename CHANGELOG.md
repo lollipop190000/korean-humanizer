@@ -1,5 +1,12 @@
 # Changelog
 
+## Windows desktop v0.3.0 — 2026-11-02
+
+- Process up to 50,000 characters locally in token-budgeted segments (maximum 256), preserving line boundaries.
+- Show progress; split truncated segments with bounded retries and report incomplete documents explicitly.
+- Distinguish unchanged text, whitespace-only edits and changed text. No model-quality improvement claim.
+- Same trained weights and greedy decoding; no paid GPU execution or retraining.
+
 ## Windows desktop v0.2.0 — 2026-11-02
 
 - Local text editor with rewrite/copy actions and a model kept in memory between requests.

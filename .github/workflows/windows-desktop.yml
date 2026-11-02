@@ -8,6 +8,7 @@ on:
       - '*cmd'
       - 'src/korean_humanizer/desktop.py'
       - 'src/korean_humanizer/local_model.py'
+      - 'src/korean_humanizer/long_text.py'
       - 'scripts/run_desktop.py'
       - 'scripts/build_windows_package.py'
       - '.github/workflows/windows-desktop.yml'
@@ -65,5 +66,6 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release create desktop-v0.2.0 --title 'Windows desktop v0.2.0' --notes-file windows/RELEASE_NOTES.md --target "$GITHUB_SHA" --latest=false
-          gh release upload desktop-v0.2.0 dist/Korean-Humanizer-Windows.zip dist/SHA256SUMS.txt
+          gh release create desktop-v0.3.0 --title 'Windows desktop v0.3.0' --notes-file windows/RELEASE_NOTES.md --target "$GITHUB_SHA" --latest=false --draft
+          gh release upload desktop-v0.3.0 dist/Korean-Humanizer-Windows.zip dist/SHA256SUMS.txt
+          gh release edit desktop-v0.3.0 --draft=false --latest=false

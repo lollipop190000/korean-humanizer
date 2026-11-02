@@ -10,6 +10,7 @@ import webbrowser
 from concurrent.futures import ThreadPoolExecutor
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
+from korean_humanizer.long_text import MAX_CHARACTERS, rewrite_document
 from korean_humanizer.model_download import ROOT, download_model
 
 
@@ -40,8 +41,8 @@ class Application:
             return dict(self.state)
 
     def submit(self, text):
-        if not isinstance(text, str) or not text.strip() or len(text) > 10000:
-            raise ValueError("1~10,000자의 글을 입력해 주세요. 긴 글은 문단으로 나눠 주세요.")
+        if not isinstance(text, str) or not text.strip() or len(text) > MAX_CHARACTERS:
+            raise ValueError("1~50,000자의 글을 입력해 주세요.")
         with self.lock:
             if self.state["status"] == "busy":
                 return False
@@ -51,16 +52,34 @@ class Application:
                 if self.model is None
                 else "글을 다듬고 있습니다.",
             }
-        self.pool.submit(self.process, text.strip())
+        self.pool.submit(self.process, text)
         return True
+
+    def progress(self, completed, total, retries):
+        with self.lock:
+            self.state = {
+                "status": "busy",
+                "message": f"{completed}/{total}구간 완료 · 내 컴퓨터에서 처리 중"
+                + (f" · 출력이 잘린 구간을 더 나눠 처리 중 ({retries}회)" if retries else ""),
+                "progress": {"completed": completed, "total": total},
+            }
 
     def process(self, text):
         try:
             if self.model is None:
                 self.model = self.loader()
-            result = self.model.rewrite(text, max_new_tokens=512)
+            result = rewrite_document(self.model, text, self.progress)
+            message = {
+                "unchanged": "변경 없음: 모델이 원문을 그대로 반환했습니다.",
+                "whitespace_only": "공백만 변경됐습니다. 문장 내용은 같습니다.",
+                "changed": "문장이 변경됐습니다. 의미와 자연스러움을 직접 확인해 주세요.",
+            }[result["change_kind"]]
             with self.lock:
-                self.state = {"status": "done", "result": result, "message": "완료했습니다."}
+                self.state = {
+                    "status": "done",
+                    "result": result,
+                    "message": f"{result['chunks_total']}구간 처리 완료. {message}",
+                }
         except Exception as error:
             if isinstance(error, ValueError):
                 message = str(error)
@@ -132,7 +151,7 @@ def make_server(port=8765, app=None):
                 return
             try:
                 size = int(self.headers.get("Content-Length", "0"))
-                if not 0 < size <= 65536:
+                if not 0 < size <= 1024 * 1024:
                     raise ValueError("요청 크기가 올바르지 않습니다.")
                 body = json.loads(self.rfile.read(size))
                 if not isinstance(body, dict):
