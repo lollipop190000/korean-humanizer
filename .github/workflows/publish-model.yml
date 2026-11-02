@@ -1,0 +1,23 @@
+name: Publish verified trained adapter
+on:
+  workflow_dispatch:
+    inputs:
+      model_source_url:
+        description: Temporary download URL for the approved model-only package
+        required: true
+        type: string
+permissions:
+  contents: write
+jobs:
+  publish:
+    if: github.repository == 'lollipop190000/korean-humanizer'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - run: python scripts/publish_model_assets.py
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MODEL_SOURCE_URL: ${{ inputs.model_source_url }}
