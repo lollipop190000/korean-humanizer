@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- PC installation guide and Colab quickstart notebook with an optional inference section.
+- Local Qwen3-4B base/compatible adapter inference, explicit execution, and protected-content checks.
+- CPU notebook smoke run verified; actual CUDA/MPS model generation remains unverified for this example.
+
 ## 0.1.0 — 2026-11-02
 
 - Initial public source release under MIT, with preserved Apache-2.0 reference-prompt attribution.

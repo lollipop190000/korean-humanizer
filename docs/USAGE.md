@@ -1,5 +1,7 @@
 # 사용법
 
+처음이라면 [PC 설치](INSTALL.md) 또는 [Colab](COLAB.md)에서 시작하세요.
+
 ## CPU 도구 확인
 
 ```bash

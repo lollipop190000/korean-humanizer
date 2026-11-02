@@ -10,6 +10,16 @@ validation, completion-only LoRA training, and paired evaluation.
 설치만으로 완성된 Humanizer 모델이 실행되는 배포판은 아닙니다.
 `identity`는 입력을 그대로 반환하는 소프트웨어 비교 기준입니다.
 
+## PC와 Colab에서 사용하기
+
+- [Windows·macOS·Linux 설치 및 실제 모델 실행](docs/INSTALL.md)
+- [Google Colab 안내](docs/COLAB.md)
+
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/lollipop190000/korean-humanizer/blob/main/notebooks/quickstart.ipynb)
+
+기본 도구 확인은 GPU 없이 가능합니다. 선택 추론 예제는 Qwen3-4B 기반 모델 또는
+직접 보유한 호환 어댑터를 사용합니다. 프로젝트 학습 가중치를 자동 제공하지 않습니다.
+
 ## 시작하기
 
 Python 3.11 또는 3.12와 [uv](https://docs.astral.sh/uv/)를 사용합니다.

@@ -1,0 +1,8 @@
+# Optional, separate from CPU tooling and the BF16 training environment.
+# Python 3.11/3.12. PyTorch uses the platform's default wheel; see INSTALL.md for CUDA.
+torch==2.6.0
+transformers==4.51.3
+accelerate==1.6.0
+peft==0.15.2
+safetensors==0.5.3
+huggingface-hub==0.30.2
