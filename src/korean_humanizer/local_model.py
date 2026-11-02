@@ -3,6 +3,7 @@
 from pathlib import Path
 
 from korean_humanizer.protection import check_protection
+from korean_humanizer.rewrite_modes import generation_options, instruction_for
 
 
 class LocalModel:
@@ -71,10 +72,13 @@ class LocalModel:
         self.spec, self.adapter, self.device = spec, adapter, device
         self.dtype, self.quantized = dtype, quantized
 
-    def render_prompt(self, text):
+    def render_prompt(self, text, rewrite_mode="standard"):
         return self.tokenizer.apply_chat_template(
             [
-                {"role": "system", "content": self.spec["instruction"]},
+                {
+                    "role": "system",
+                    "content": instruction_for(self.spec["instruction"], rewrite_mode),
+                },
                 {"role": "user", "content": text},
             ],
             tokenize=False,
@@ -82,16 +86,18 @@ class LocalModel:
             enable_thinking=False,
         )
 
-    def prompt_token_count(self, text):
-        return len(self.tokenizer.encode(self.render_prompt(text), add_special_tokens=False))
+    def prompt_token_count(self, text, rewrite_mode="standard"):
+        return len(
+            self.tokenizer.encode(self.render_prompt(text, rewrite_mode), add_special_tokens=False)
+        )
 
-    def rewrite(self, text, max_new_tokens=512):
+    def rewrite(self, text, max_new_tokens=512, rewrite_mode="standard"):
         if not text.strip():
             raise ValueError("다듬을 글을 입력해 주세요.")
         if not 1 <= max_new_tokens <= 1024:
             raise ValueError("출력 길이 범위가 올바르지 않습니다.")
         tokenizer, model, torch = self.tokenizer, self.model, self.torch
-        prompt = self.render_prompt(text)
+        prompt = self.render_prompt(text, rewrite_mode)
         inputs = tokenizer(prompt, add_special_tokens=False, return_tensors="pt")
         count = inputs.input_ids.shape[-1]
         if count > 2048:
@@ -99,7 +105,7 @@ class LocalModel:
         with torch.inference_mode():
             generated = model.generate(
                 **inputs.to(self.device),
-                do_sample=False,
+                **generation_options(rewrite_mode),
                 max_new_tokens=max_new_tokens,
                 pad_token_id=tokenizer.pad_token_id or tokenizer.eos_token_id,
             )
@@ -113,6 +119,7 @@ class LocalModel:
             "device": self.device,
             "dtype": str(self.dtype),
             "quantization": "nf4" if self.quantized else "none",
+            "rewrite_mode": rewrite_mode,
             "output": output,
             "finish_reason": "stop" if len(tokens) and int(tokens[-1]) in eos_ids else "length",
             "checks": check_protection(text, output),

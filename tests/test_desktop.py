@@ -11,10 +11,10 @@ from korean_humanizer.desktop import Application, make_server
 
 
 class FakeModel:
-    def prompt_token_count(self, text):
+    def prompt_token_count(self, text, rewrite_mode="standard"):
         return 100 + len(text)
 
-    def rewrite(self, text, max_new_tokens):
+    def rewrite(self, text, max_new_tokens, rewrite_mode="standard"):
         return {
             "output": "합성 시험 결과: " + text,
             "finish_reason": "stop",
@@ -47,11 +47,15 @@ def local_app():
     thread.join()
 
 
-def request(url, token, text, origin=None):
+def request(url, token, text, origin=None, rewrite_mode="strong"):
     headers = {"Content-Type": "application/json", "X-Local-Token": token}
     if origin:
         headers["Origin"] = origin
-    req = urllib.request.Request(url + "/api/rewrite", json.dumps({"text": text}).encode(), headers)
+    req = urllib.request.Request(
+        url + "/api/rewrite",
+        json.dumps({"text": text, "rewrite_mode": rewrite_mode}).encode(),
+        headers,
+    )
     with urllib.request.urlopen(req) as response:
         return response.status
 
@@ -149,3 +153,16 @@ def test_identity_is_visible_and_failed_document_has_no_result():
     assert "전체 미완료" in state["message"]
     assert "result" not in state
     app.pool.shutdown()
+
+
+def test_desktop_mode_selection_and_invalid_mode(local_app):
+    url, token, app, loads = local_app
+    for mode, label in [("strong", "적극 재작성"), ("standard", "기본 다듬기")]:
+        assert request(url, token, "선택한 모드", rewrite_mode=mode) == 202
+        state = finished(app)
+        assert state["result"]["rewrite_mode"] == mode
+        assert label in state["message"]
+    assert len(loads) == 1
+    with pytest.raises(urllib.error.HTTPError) as error:
+        request(url, token, "입력", rewrite_mode="invalid")
+    assert error.value.code == 400

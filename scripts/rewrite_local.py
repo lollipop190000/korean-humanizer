@@ -29,10 +29,10 @@ def prepare(text_file, adapter=None, max_new_tokens=256):
     return text, spec, adapter
 
 
-def rewrite(text, spec, adapter, device, max_new_tokens):
+def rewrite(text, spec, adapter, device, max_new_tokens, rewrite_mode="standard"):
     from korean_humanizer.local_model import LocalModel
 
-    return LocalModel(spec, adapter, device).rewrite(text, max_new_tokens)
+    return LocalModel(spec, adapter, device).rewrite(text, max_new_tokens, rewrite_mode)
 
 
 def main():
@@ -43,6 +43,7 @@ def main():
     candidate.add_argument("--base", action="store_true", help="Explicitly use untrained base only")
     parser.add_argument("--device", choices=["auto", "cpu", "cuda", "mps"], default="auto")
     parser.add_argument("--max-new-tokens", type=int, default=256)
+    parser.add_argument("--rewrite-mode", choices=["standard", "strong"], default="standard")
     parser.add_argument("--execute", action="store_true", help="Download weights and run inference")
     args = parser.parse_args()
     text, spec, adapter = prepare(args.text_file, args.adapter, args.max_new_tokens)
@@ -59,6 +60,7 @@ def main():
                     "revision": spec["revision"],
                     "candidate": selected,
                     "device": args.device,
+                    "rewrite_mode": args.rewrite_mode,
                     "model_downloaded": False,
                     "next": "Add --execute to download model weights and run inference",
                 },
@@ -73,7 +75,7 @@ def main():
     print("Loading model locally; first run downloads several GB of weights.", file=sys.stderr)
     print(
         json.dumps(
-            rewrite(text, spec, adapter, args.device, args.max_new_tokens)
+            rewrite(text, spec, adapter, args.device, args.max_new_tokens, args.rewrite_mode)
             | {"candidate": selected},
             ensure_ascii=False,
             indent=2,

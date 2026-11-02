@@ -16,6 +16,8 @@ validation, completion-only LoRA training, and paired evaluation.
 **글을 직접 입력하는 화면이 필요하다면 [Windows 앱 설치](docs/DESKTOP.md)를 이용하세요.**
 ZIP 압축 해제 → `Install.cmd` 실행 → 바탕화면 바로가기로 시작합니다.
 최대 50,000자를 자동 분할·병합하며 진행률과 변경 여부를 표시합니다.
+앱 v0.4.0에는 어순·문장 구조 변경을 요청하는 **적극 재작성 (실험)** 모드가 추가됐습니다.
+같은 학습 가중치를 쓰는 실행 모드이며 재학습 모델이 아닙니다.
 현재 모델은 원문을 그대로 반환하는 경향이 있으며, 재작성 품질 향상은 충분히 검증되지 않았습니다.
 
 - [Windows·macOS·Linux 설치 및 실제 모델 실행](docs/INSTALL.md)

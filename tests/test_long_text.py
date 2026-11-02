@@ -13,10 +13,10 @@ class EchoModel:
     def __init__(self):
         self.calls = []
 
-    def prompt_token_count(self, text):
+    def prompt_token_count(self, text, rewrite_mode="standard"):
         return 100 + len(text)
 
-    def rewrite(self, text, max_new_tokens):
+    def rewrite(self, text, max_new_tokens, rewrite_mode="standard"):
         assert self.prompt_token_count(text) <= 1024
         assert max_new_tokens == 1024
         self.calls.append(text)
@@ -48,8 +48,8 @@ def test_split_round_trip_and_exact_identity_including_whitespace(text):
 
 def test_merge_changed_paragraphs_in_order_and_keep_layout():
     class EditModel(EchoModel):
-        def rewrite(self, text, max_new_tokens):
-            result = super().rewrite(text, max_new_tokens)
+        def rewrite(self, text, max_new_tokens, rewrite_mode="standard"):
+            result = super().rewrite(text, max_new_tokens, rewrite_mode)
             result["output"] = "\n" + text.replace("시험", "검사") + "\n"
             return result
 
@@ -61,8 +61,8 @@ def test_merge_changed_paragraphs_in_order_and_keep_layout():
 
 def test_only_truncated_chunk_is_split_and_retried():
     class LimitedModel(EchoModel):
-        def rewrite(self, text, max_new_tokens):
-            result = super().rewrite(text, max_new_tokens)
+        def rewrite(self, text, max_new_tokens, rewrite_mode="standard"):
+            result = super().rewrite(text, max_new_tokens, rewrite_mode)
             if len(text) > 20:
                 result.update(output="잘린 결과", finish_reason="length")
             return result
@@ -80,8 +80,8 @@ def test_only_truncated_chunk_is_split_and_retried():
 @pytest.mark.parametrize("mode", ["length", "empty", "error", "other"])
 def test_failed_segment_never_returns_incomplete_document_as_done(mode):
     class FailingModel(EchoModel):
-        def rewrite(self, text, max_new_tokens):
-            result = super().rewrite(text, max_new_tokens)
+        def rewrite(self, text, max_new_tokens, rewrite_mode="standard"):
+            result = super().rewrite(text, max_new_tokens, rewrite_mode)
             if text == "정상":
                 return result
             if mode == "error":
@@ -110,8 +110,8 @@ def test_oversized_or_excessively_fragmented_documents_fail_before_generation():
 
 def test_protection_checked_after_merge_and_per_chunk():
     class UnsafeModel(EchoModel):
-        def rewrite(self, text, max_new_tokens):
-            result = super().rewrite(text, max_new_tokens)
+        def rewrite(self, text, max_new_tokens, rewrite_mode="standard"):
+            result = super().rewrite(text, max_new_tokens, rewrite_mode)
             result["output"] = text.replace("2026", "2027")
             return result
 

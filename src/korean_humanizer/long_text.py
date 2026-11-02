@@ -3,6 +3,7 @@
 import re
 
 from korean_humanizer.protection import check_protection
+from korean_humanizer.rewrite_modes import validate_mode
 
 MAX_CHARACTERS = 50_000
 MAX_CHUNKS = 256
@@ -61,10 +62,15 @@ class DocumentError(ValueError):
     """A failed document is never exposed as a complete result."""
 
 
-def rewrite_document(model, text, progress=None):
+def rewrite_document(model, text, progress=None, rewrite_mode="standard"):
+    validate_mode(rewrite_mode)
     if not isinstance(text, str) or not text.strip() or len(text) > MAX_CHARACTERS:
         raise ValueError("1~50,000자의 글을 입력해 주세요.")
-    parts = split_document(text, model.prompt_token_count)
+
+    def count_tokens(part):
+        return model.prompt_token_count(part, rewrite_mode=rewrite_mode)
+
+    parts = split_document(text, count_tokens)
     total = sum(bool(part.strip()) for part in parts)
     completed = retries = warnings = 0
     metadata = None
@@ -83,14 +89,14 @@ def rewrite_document(model, text, progress=None):
         leading = part[: len(part) - len(part.lstrip())]
         trailing = part[len(part.rstrip()) :]
         update()
-        result = model.rewrite(core, max_new_tokens=OUTPUT_TOKENS)
+        result = model.rewrite(core, max_new_tokens=OUTPUT_TOKENS, rewrite_mode=rewrite_mode)
         if result["finish_reason"] == "length":
             if depth >= MAX_SPLIT_RETRIES or len(core) < 2:
                 raise DocumentError("작은 구간에서도 출력이 잘려 처리를 중단했습니다.")
             cut = boundary(core, len(core) // 2)
             smaller = []
             for half in (core[:cut], core[cut:]):
-                smaller.extend(split_document(half, model.prompt_token_count))
+                smaller.extend(split_document(half, count_tokens))
             total += sum(bool(p.strip()) for p in smaller) - 1
             retries += 1
             update()
@@ -128,5 +134,6 @@ def rewrite_document(model, text, progress=None):
         "chunks_total": total,
         "split_retries": retries,
         "change_kind": change_kind(text, output),
+        "rewrite_mode": rewrite_mode,
         "human_review_completed": False,
     }

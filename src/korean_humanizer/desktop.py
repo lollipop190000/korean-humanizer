@@ -12,6 +12,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 from korean_humanizer.long_text import MAX_CHARACTERS, rewrite_document
 from korean_humanizer.model_download import ROOT, download_model
+from korean_humanizer.rewrite_modes import validate_mode
 
 
 class Application:
@@ -40,7 +41,8 @@ class Application:
         with self.lock:
             return dict(self.state)
 
-    def submit(self, text):
+    def submit(self, text, rewrite_mode="strong"):
+        validate_mode(rewrite_mode)
         if not isinstance(text, str) or not text.strip() or len(text) > MAX_CHARACTERS:
             raise ValueError("1~50,000자의 글을 입력해 주세요.")
         with self.lock:
@@ -52,7 +54,7 @@ class Application:
                 if self.model is None
                 else "글을 다듬고 있습니다.",
             }
-        self.pool.submit(self.process, text)
+        self.pool.submit(self.process, text, rewrite_mode)
         return True
 
     def progress(self, completed, total, retries):
@@ -64,11 +66,11 @@ class Application:
                 "progress": {"completed": completed, "total": total},
             }
 
-    def process(self, text):
+    def process(self, text, rewrite_mode="strong"):
         try:
             if self.model is None:
                 self.model = self.loader()
-            result = rewrite_document(self.model, text, self.progress)
+            result = rewrite_document(self.model, text, self.progress, rewrite_mode)
             message = {
                 "unchanged": "변경 없음: 모델이 원문을 그대로 반환했습니다.",
                 "whitespace_only": "공백만 변경됐습니다. 문장 내용은 같습니다.",
@@ -78,7 +80,10 @@ class Application:
                 self.state = {
                     "status": "done",
                     "result": result,
-                    "message": f"{result['chunks_total']}구간 처리 완료. {message}",
+                    "message": (
+                        ("적극 재작성" if rewrite_mode == "strong" else "기본 다듬기")
+                        + f" · {result['chunks_total']}구간 처리 완료. {message}"
+                    ),
                 }
         except Exception as error:
             if isinstance(error, ValueError):
@@ -156,7 +161,7 @@ def make_server(port=8765, app=None):
                 body = json.loads(self.rfile.read(size))
                 if not isinstance(body, dict):
                     raise ValueError("요청 형식이 올바르지 않습니다.")
-                if app.submit(body.get("text")):
+                if app.submit(body.get("text"), body.get("rewrite_mode", "strong")):
                     self.send_data(202, {"status": "busy"})
                 else:
                     self.send_data(409, {"error": "이전 글을 다듬는 중입니다."})

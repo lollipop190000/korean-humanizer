@@ -1,5 +1,14 @@
 # Changelog
 
+## Windows desktop v0.4.0 — 2026-11-02
+
+- Add an explicitly experimental strong rewrite mode with a structural-rewrite instruction and sampling.
+- Keep the previous conservative instruction and greedy decoding as the standard mode.
+- Count the selected instruction in each chunk's token budget; apply the mode to retries too.
+- Expose mode selection in the local UI and CLI; show unchanged results honestly in either mode.
+- Document actual training-pair similarity. Same adapter; no retraining or verified quality improvement.
+- Reject oversized pasted text visibly instead of silently clipping it at the HTML input limit.
+
 ## Windows desktop v0.3.0 — 2026-11-02
 
 - Process up to 50,000 characters locally in token-budgeted segments (maximum 256), preserving line boundaries.
